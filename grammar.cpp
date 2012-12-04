@@ -8,12 +8,17 @@
 #include <string>
 #include <cmath>
 using namespace std;
+
+vector<bool> systape;
+vector<string> program;
+size_t programCounter;
+
 // CFG
 
 void consume(string& in) {in=in.substr(1);}
 
-int number(string& in) {
-	int ret=0;
+unsigned long number(string& in) {
+	unsigned long ret=0;
 	while (in[0]>='0' && in[0]<='9') {ret*=10;ret+=(int)(in[0]-'0');consume(in);}
 	return ret;
 }
@@ -34,7 +39,7 @@ Interval inter(string& in) {
 }
 
 bool tape(string& in) {
-	int start=number(in);
+	unsigned int start=number(in);
 	string binary_string;
 	if (in[0]==',') {consume(in);}
 	else {return false;}
@@ -75,34 +80,43 @@ bool r(string& in) {
 	Interval interv=inter(in);
 	if (interv.start<0 || interv.end<0) {return false;}
 	vector <bool> newTape=systape;
-	for (size_t i=interv.start;i<interv.end;++i) {
+	for (size_t i=interv.start;i<=interv.end;++i) {
 		unsigned long long val=0;
 		for (int j=-(range/2);j<=range/2;++j) {
 			int pos=(int) i+j;
 			if (pos<0) {pos=systape.size()+pos;}
 			else if (pos>=systape.size()) {pos=(pos-systape.size());}
 			val=val<<1;			
-			val+=systape[i+j]-'0';
+			val+=systape[pos];
 		}
-		newTape[i+(int)(range/2)]=rule[rule.size()-1-val];
+		newTape[i]=rule[rule.size()-1-val]-'0';
 	}
 	systape=newTape;
 	return true;
 }
 
-bool j(string& in) { // TODO
+bool j(string& in) {
 	if (in[0]=='J') {consume(in);}
 	else {return false;}
+	int newLine=number(in);
+	Interval interv=inter(in);
+	if (interv.start<0 || interv.end<0) {return false;}
+	for (size_t i=interv.start;i<=interv.end;++i) {
+		if (systape[i]) {programCounter=newLine-1;return true;}
+	}
+	return true;
 }
 
 bool c(string& in) { // TODO
 	if (in[0]=='C') {consume(in);}
 	else {return false;}
+	return false;
 }
 
 bool p(string& in) { // TODO
 	if (in[0]=='P') {consume(in);}
 	else {return false;}
+	return false;
 }
 
 bool o(string& in) {
@@ -115,6 +129,7 @@ bool o(string& in) {
 		cout << systape[i] << ((i==systape.size()-1 || i==interval.end)?"":",");
 	}
 	cout << "]" << endl;
+	return true;
 }
 
 bool s(string& in) {
@@ -132,7 +147,8 @@ bool s(string& in) {
 			accum=0;
 		}
 	}
-	cout << "]" << endl;;
+	cout << "]" << endl;
+	return true;
 }
 
 bool i(string& in) {
@@ -142,11 +158,11 @@ bool i(string& in) {
 	if (i.start<0 || i.end<0) {return false;}
 	cout << "BINARY INPUT:";
 	string input;
-	cin >> input;
+	getline(cin,input);
 	for (size_t j=0;j<input.size();++j) {
-		int cur_pos=i.start+j;
+		size_t cur_pos=i.start+j;
 		if (cur_pos>systape.size()) {break;}
-		if (cur_pos>i.end) {break;}
+		if (cur_pos>(size_t)i.end) {break;}
 		if (input[j]!='0' && input[j]!='1') {break;}
 		systape[cur_pos]=(bool)(input[j]-'0');
 	}
@@ -169,9 +185,9 @@ bool f(string& in) {
 		}
 	}
 	for (size_t j=0;j<converted_input.size();++j) {
-		int cur_pos=i.start+j;
+		size_t cur_pos=i.start+j;
 		if (cur_pos>systape.size()) {break;}
-		if (cur_pos>i.end) {break;}
+		if (cur_pos>(size_t)i.end) {break;}
 		if (converted_input[j]!='0' && converted_input[j]!='1') {break;}
 		systape[cur_pos]=(bool)(converted_input[j]-'0');
 	}

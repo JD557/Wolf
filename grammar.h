@@ -12,7 +12,7 @@ struct Interval {
 
 // CFG
 void consume(string& in);
-int number(string& in);
+unsigned long number(string& in);
 Interval inter(string& in);
 bool tape(string& in);
 bool line(string& in);

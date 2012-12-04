@@ -1,0 +1,6 @@
+T0,0000000000001000000000000 0 000000000000000000000 0 ; Initial tape (Notice the boundaries to avoid reading from the wrong places)
+I[26,45] ; Number of iterations as a sequence of 1's (up to 20)
+O[0,24] ; Shows a line of the triangle
+R00010010[0,24] ; Applies rule 18
+R10001000[26,46] ; Decrements the counter
+J2[26,46] ; Jumps back to the tirth line (line number 2)

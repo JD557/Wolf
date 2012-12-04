@@ -3,8 +3,11 @@
 #ifndef _SYSTEM_
 #define _SYSTEM_
 #include <vector>
+#include <string>
 using namespace std;
 
-vector<bool> systape;
+extern vector<bool> systape;
+extern vector<string> program;
+extern size_t programCounter;
 
 #endif
