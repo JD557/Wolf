@@ -8,6 +8,7 @@ using namespace std;
 
 extern vector<bool> systape;
 extern vector<string> program;
+extern vector<size_t> callStack;
 extern size_t programCounter;
 
 #endif

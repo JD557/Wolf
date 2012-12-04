@@ -1,0 +1,8 @@
+T0,1 ; Inits the tape as 1 (forces the first jump)
+J4 ; Jumps to the 5th line (jumps over the function)
+T0,0000 ; Sets the tape to 0000
+P ; Returns from the function
+T0,1111 ; Sets the tape to 1111 (the program starts here)
+O ; Outputs the tape
+C2 ; Calls the function
+O ; Outputs the result

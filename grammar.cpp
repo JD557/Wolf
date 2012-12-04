@@ -11,6 +11,7 @@ using namespace std;
 
 vector<bool> systape;
 vector<string> program;
+vector<size_t> callStack;
 size_t programCounter;
 
 // CFG
@@ -107,16 +108,26 @@ bool j(string& in) {
 	return true;
 }
 
-bool c(string& in) { // TODO
+bool c(string& in) {
 	if (in[0]=='C') {consume(in);}
 	else {return false;}
-	return false;
+	int newLine=number(in);
+	Interval interv=inter(in);
+	if (interv.start<0 || interv.end<0) {return false;}
+	for (size_t i=interv.start;i<=interv.end;++i) {
+		if (systape[i]) {
+			callStack.push_back(programCounter);
+			programCounter=newLine-1;
+			return true;}
+	}
+	return true;
 }
 
-bool p(string& in) { // TODO
+bool p(string& in) {
 	if (in[0]=='P') {consume(in);}
 	else {return false;}
-	return false;
+	if (callStack.size()>0) {programCounter=callStack[callStack.size()-1];callStack.pop_back();}
+	return true;
 }
 
 bool o(string& in) {

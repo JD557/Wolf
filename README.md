@@ -1,9 +1,16 @@
 Wolf
 ====
 
-Wolf is a programming language based mostly on cellular automata.
+Wolf is a programming language based mostly on 1 dimensional cellular automata, made for PLT Games (December 2012 - "Into the Turing Tarpit").
 
-Why? Because turing machines and lambda-calculus are too mainstream.
+FAQ
+---
+
+**What's a cellular automaton?**
+https://en.wikipedia.org/wiki/Cellular_automaton
+
+**What's a rule?**
+https://en.wikipedia.org/wiki/Wolfram_code
 
 Syntax and Semantics
 --------------------
@@ -46,9 +53,11 @@ What about the C and P commands? Thats just a bonus.
 Example Code
 ------------
 
-Examples are availible on the "examples" folder. Here's two of them:
+Examples are availible on the "examples" folder.
 
-### Hello world:
+### Hello world
+
+This one is pretty simple, just put the string on the tape and print it:
 
 ```
 T0,01001000 01000101 01001100 01001100 01001111 00100000 01010111 01001111 01010010 01001100 01000100
@@ -57,6 +66,9 @@ S
 
 ### Sierpinski's Triangle (kind of)
 
+Now, time to use the power of rule 18 and loops.
+The output is not that pretty, but the 1's will resemble a Sierpinski's Triangle.
+
 ```
 T0,0000000000001000000000000 0 000000000000000000000 0 ; Initial tape (Notice the boundaries to avoid reading from the wrong places)
 I[26,45] ; Number of iterations as a sequence of 1's (up to 20)
@@ -64,4 +76,19 @@ O[0,24] ; Shows a line of the triangle
 R00010010[0,24] ; Applies rule 18
 R10001000[26,46] ; Decrements the counter
 J2[26,46] ; Jumps back to the tirth line (line number 2)
+```
+
+### Function Calling
+
+Now, let's show how to use C and P to call some functions.
+
+```
+T0,1 ; Inits the tape as 1 (forces the first jump)
+J4 ; Jumps to the 5th line (jumps over the function)
+T0,0000 ; Sets the tape to 0000
+P ; Returns from the function
+T0,1111 ; Sets the tape to 1111 (the program starts here)
+O ; Outputs the tape
+C2 ; Calls the function
+O ; Outputs the result
 ```
