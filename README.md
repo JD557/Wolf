@@ -92,3 +92,35 @@ O ; Outputs the tape
 C2 ; Calls the function
 O ; Outputs the result
 ```
+
+### Implementing a Turing Machine
+
+To show that this language turing-complete, heres how to implement a turing machine in Wolf.
+
+Writing to the tape can be easily done with the T command. Lets assume we want a tape of size 5 with a one on the first position:
+
+```
+T0,10000
+```
+
+If we then want to change the first element to 0, we do:
+
+```
+T0,0
+```
+
+Easy right? Now, to make Wolf work as a turing machine, lets assume that the read/write head's position is the first cell.
+With the head fixed in a position, we can simply shift everything left with rule 10101010 (rule 170) and everything right with rule 11110000 (rule 240).
+Since our rules wrap-around the tape, we can move left and right without losing data.
+
+So, to shift our tape left (move the head to the right):
+```
+R10101010
+```
+
+And to shift our tape right (move the head to the left):
+```
+R11110000
+```
+
+Finaly, to read from the tape, we can use the J command (or the C and P commands) to read the first symbol and jump (or not).

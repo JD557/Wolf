@@ -24,44 +24,56 @@ unsigned long number(string& in) {
 	return ret;
 }
 
+string binaryString(string& in) {
+	string ret="";
+	while (in[0]=='0' || in[0]=='1') {ret+=in[0];consume(in);}
+	return ret;
+}
+
+void write(string bin,int start, int end) {
+	for (size_t i=0;i<bin.size();++i) {
+		if (end>0 && start+i>=end) {return;}
+		bool val=(bool)(bin[i]-'0');			
+		if (start+i>=systape.size()) {systape.push_back(val);}
+		else {systape[start+i]=val;}
+	}
+}
+
 Interval inter(string& in) {
 	Interval error={-1,-1};	
 	Interval i={0,0};
+
 	if (in[0]=='[') {consume(in);}
 	else {i.end=systape.size()-1;return i;}
 	i.start=number(in);
+
 	if (in[0]==',') {consume(in);}
 	else {return error;}
+
 	i.end=number(in);
 	if (i.end<i.start) {return error;}
 	if (in[0]==']') {consume(in);}
 	else {return error;}
-	return i;
-}
 
-bool tape(string& in) {
-	unsigned int start=number(in);
-	string binary_string;
-	if (in[0]==',') {consume(in);}
-	else {return false;}
-	if (start>systape.size()) {systape.resize(start);}
-	for (size_t i=start;in.size()>0;++i) {
-		if (in[0]=='0' || in[0]=='1') {
-			bool val=(bool)(in[0]-'0');			
-			consume(in);
-			if (i>=systape.size()) {systape.push_back(val);}
-			else {systape[i]=val;}
-		}
-		else if (in.size()>0 && in[0]!='\n' && in[0]!='\r') {return false;}
-	}
-	return true;
+	return i;
 }
 
 bool t(string& in) {
 	if (in[0]=='T') {consume(in);}
 	else {return false;}
-	if (tape(in)) {return true;}
+
+	unsigned int start=number(in);
+	if (in[0]==',') {consume(in);}
 	else {return false;}
+	if (start>systape.size()) {systape.resize(start);}
+
+	string binary_string;
+	string binStr=binaryString(in);
+	if (binStr.size()==0) {return false;}
+	
+	write(binStr,start);
+
+	return true;
 }
 
 bool x(string& in) {
@@ -74,12 +86,16 @@ bool x(string& in) {
 bool r(string& in) {
 	if (in[0]=='R') {consume(in);}
 	else {return false;}
-	string rule;
-	while(in[0]=='0' || in[0]=='1') {rule+=in[0];consume(in);}
+
+	string rule=binaryString(in);
+	if (rule.size()==0) {return false;}
+
 	float range=log(rule.length())/log(2);
 	if (range!=(int) range) {return false;}
+
 	Interval interv=inter(in);
 	if (interv.start<0 || interv.end<0) {return false;}
+
 	vector <bool> newTape=systape;
 	for (size_t i=interv.start;i<=interv.end;++i) {
 		unsigned long long val=0;
@@ -99,9 +115,12 @@ bool r(string& in) {
 bool j(string& in) {
 	if (in[0]=='J') {consume(in);}
 	else {return false;}
+
 	int newLine=number(in);
+
 	Interval interv=inter(in);
 	if (interv.start<0 || interv.end<0) {return false;}
+
 	for (size_t i=interv.start;i<=interv.end;++i) {
 		if (systape[i]) {programCounter=newLine-1;return true;}
 	}
@@ -111,9 +130,12 @@ bool j(string& in) {
 bool c(string& in) {
 	if (in[0]=='C') {consume(in);}
 	else {return false;}
+
 	int newLine=number(in);
+
 	Interval interv=inter(in);
 	if (interv.start<0 || interv.end<0) {return false;}
+
 	for (size_t i=interv.start;i<=interv.end;++i) {
 		if (systape[i]) {
 			callStack.push_back(programCounter);
@@ -126,6 +148,7 @@ bool c(string& in) {
 bool p(string& in) {
 	if (in[0]=='P') {consume(in);}
 	else {return false;}
+
 	if (callStack.size()>0) {programCounter=callStack[callStack.size()-1];callStack.pop_back();}
 	return true;
 }
@@ -133,8 +156,10 @@ bool p(string& in) {
 bool o(string& in) {
 	if (in[0]=='O') {consume(in);}
 	else {return false;}
+
 	Interval interval=inter(in);
 	if (interval.start<0 || interval.end<0) {return false;}
+
 	cout << "[";
 	for (size_t i=interval.start;i<systape.size() && i<=interval.end;++i) {
 		cout << systape[i] << ((i==systape.size()-1 || i==interval.end)?"":",");
@@ -146,8 +171,10 @@ bool o(string& in) {
 bool s(string& in) {
 	if (in[0]=='S') {consume(in);}
 	else {return false;}
+
 	Interval interval=inter(in);
 	if (interval.start<0 || interval.end<0) {return false;}
+
 	cout << "[";
 	char accum=0;
 	for (size_t i=interval.start;i<systape.size() && i<=interval.end;++i) {
@@ -165,26 +192,25 @@ bool s(string& in) {
 bool i(string& in) {
 	if (in[0]=='I') {consume(in);}
 	else {return false;}
+
 	Interval i=inter(in);
 	if (i.start<0 || i.end<0) {return false;}
+
 	cout << "BINARY INPUT:";
 	string input;
 	getline(cin,input);
-	for (size_t j=0;j<input.size();++j) {
-		size_t cur_pos=i.start+j;
-		if (cur_pos>systape.size()) {break;}
-		if (cur_pos>(size_t)i.end) {break;}
-		if (input[j]!='0' && input[j]!='1') {break;}
-		systape[cur_pos]=(bool)(input[j]-'0');
-	}
+
+	write(input,i.start,i.end);
 	return true;
 }
 
 bool f(string& in) {
 	if (in[0]=='F') {consume(in);}
 	else {return false;}
+
 	Interval i=inter(in);
 	if (i.start<0 || i.end<0) {return false;}
+
 	cout << "STRING INPUT:";
 	string input;
 	cin >> input;
@@ -195,13 +221,9 @@ bool f(string& in) {
 			converted_input+=((input[x]&(1<<y))!=0?'1':'0');
 		}
 	}
-	for (size_t j=0;j<converted_input.size();++j) {
-		size_t cur_pos=i.start+j;
-		if (cur_pos>systape.size()) {break;}
-		if (cur_pos>(size_t)i.end) {break;}
-		if (converted_input[j]!='0' && converted_input[j]!='1') {break;}
-		systape[cur_pos]=(bool)(converted_input[j]-'0');
-	}
+
+	write(converted_input,i.start,i.end);
+
 	return true;
 }
 

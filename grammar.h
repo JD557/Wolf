@@ -14,7 +14,8 @@ struct Interval {
 void consume(string& in);
 unsigned long number(string& in);
 Interval inter(string& in);
-bool tape(string& in);
+string binaryString(string& in);
+void write(string bin,int start, int end=-1);
 bool line(string& in);
 
 bool t(string& in); // T<start>,<tape>            - Saves the binary string <tape> on the tape starting on <start>
